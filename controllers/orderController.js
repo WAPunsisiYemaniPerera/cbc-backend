@@ -20,7 +20,7 @@ export function createOrder (req,res){
         total : 0
     }
 
-    //generate the order id
+    
     Order.find().sort({
         date : -1
     }).limit(1).then(
