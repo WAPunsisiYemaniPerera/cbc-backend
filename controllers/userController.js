@@ -60,6 +60,10 @@ export function loginUser (req,res){
             }else{
                 const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
+                //check for user.isDisabled
+                //check for invalid attempts
+                //if invalid attempts > 3 AND user.blockUntil > Date.now() res
+
                 if(isPasswordCorrect){
                     const userData = {
                         email : user.email,
@@ -71,16 +75,23 @@ export function loginUser (req,res){
                         IsEmailVerified : user.isEmailVerified
                     }
 
-                    const token = jwt.sign(userData, process.env.JWT_KEY);
+                    const token = jwt.sign(userData, process.env.JWT_KEY,{
+                        expiresIn : "48hrs"
+                    });
 
                     res.json({
                         message : "Login Successful!!",
-                        token : token
+                        token : token,
+                        user : userData //take the userdata to the frontend
                     })
                 }else{
                     res.status(403).json({
                         message : "Invalid Password!!"
                     })
+                    //user -> blockUntil = Date.now() + 5*60*1000
+                    //user -> inValidAttempts = default=0 +1
+                    //if(user.inValidAttempts > 3){
+                    // user.isDisabled = true
                 }
             }
         }
