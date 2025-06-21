@@ -1,34 +1,32 @@
 import Product from "../models/product.js";
 
-export async function createProduct(req,res){
-    if(req.user == null){
-        res.status(403).json({
-            message : "You need to login first!!"
-        })
-        return;
-    }
-    
-    if(req.user.role != "admin"){
-        res.status(403).json({
-            message : "You are not authorized to create a product!!"
-        })
-        return;
-    }
+export async function createProduct(req, res) {
+	if (req.user == null) {
+		res.status(403).json({
+			message: "You need to login first",
+		});
+		return;
+	}
 
-    const product = new Product(req.body);
+	if (req.user.role != "admin") {
+		res.status(403).json({
+			message: "You are not authorized to create a product",
+		});
+		return;
+	}
 
-    try{
-        await product.save()
-        res.json({
-            message : "Product saved successfully!!"
-        })
-    }catch(err){
-        res.status(500).json({
-            message : "Product not saved"
-        })
-    }
-
-
+	const product = new Product(req.body);
+	try {
+		await product.save();
+		res.json({
+			message: "Product saved successfully",
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({
+			message: "Product not saved",
+		});
+	}
 }
 
 export function getProducts(req,res){
@@ -44,6 +42,23 @@ export function getProducts(req,res){
         }
     )
 }
+
+export async function getProductById(req,res) {
+    const productId = req.params.id
+    console.log(productId)
+    const product = await Product.findOne({productId : productId})
+
+    if(product == null){
+        res.status(404).json({
+            message: "Product not found"
+        })
+        return
+    }
+    res.json({
+        product : product
+    })
+}
+
 
 export function deleteProduct(req,res){
     if(req.user == null){
